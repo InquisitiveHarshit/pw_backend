@@ -72,3 +72,5 @@ app.listen(PORT, () => {
   console.log(`📋 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`⚠️  DEV MODE: Auth middleware is mocked (req.user = Dev Admin)`);
 });
+
+module.exports = app;
