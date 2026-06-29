@@ -24,6 +24,7 @@ app.use(
     origin: [
       "http://localhost:3000",  // Next.js dev
       "http://localhost:5173",  // Vite dev
+      "https://pw-one-blond.vercel.app", // Deployed Vercel frontend
     ],
     credentials: true,
   })
