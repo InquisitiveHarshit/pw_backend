@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "kxuovhrwl",
+    "title": "noida",
+    "description": "fansdfkjandfknasf faksdfnasdjfnadfskj",
+    "location": "noida",
+    "price": 394999,
+    "type": "apartment",
+    "bhk": 3,
+    "area": 2344,
+    "amenities": [
+      "Gymnasium",
+      "Clubhouse",
+      "Jogging Track",
+      "Parking",
+      "Indoor Games Room",
+      "Intercom",
+      "CCTV Surveillance",
+      "Landscaped Gardens",
+      "EV Charging",
+      "Lift / Elevator",
+      "Swimming Pool",
+      "Kids Play Area",
+      "Yoga / Meditation Area",
+      "Power Backup",
+      "24/7 Security"
+    ],
+    "totalSlots": 10,
+    "filledSlots": 0,
+    "status": "full",
+    "isFeatured": false,
+    "images": [],
+    "postedBy": "local-user",
+    "createdAt": "2026-06-26T09:35:38.783Z"
+  }
+]
