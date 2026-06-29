@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
-const { devMockUser } = require("./middleware/auth");
 
 // Route files
 const authRoutes = require("./routes/authRoutes");
@@ -12,9 +11,6 @@ const groupRoutes = require("./routes/groupRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
@@ -22,19 +18,31 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",  // Next.js dev
-      "http://localhost:5173",  // Vite dev
-      "https://pw-one-blond.vercel.app", // Deployed Vercel frontend
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://pw-one-blond.vercel.app",
     ],
     credentials: true,
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// ─── DEV: Mock user removed, real auth enabled ──────────────────────────────────
-// Auth middleware will be applied on a per-route basis below.
+// ─── DB Connection Middleware (lazy connect for serverless) ───────────────────
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("DB connection failed:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Database connection failed. Please try again.",
+    });
+  }
+});
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
@@ -65,13 +73,18 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+// ─── Start Server (local dev only) ───────────────────────────────────────────
+// Vercel doesn't need app.listen() — it uses module.exports = app instead.
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📋 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`⚠️  DEV MODE: Auth middleware is mocked (req.user = Dev Admin)`);
-});
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`📋 Environment: ${process.env.NODE_ENV || "development"}`);
+    });
+  });
+}
 
+// Export for Vercel serverless
 module.exports = app;
