@@ -15,13 +15,13 @@ router.get("/", getAllBlogs);
 // GET /api/blogs/:id — public
 router.get("/:id", getBlog);
 
-// POST /api/blogs
-router.post("/", createBlog);
+// POST /api/blogs — admin only
+router.post("/", requireLogin, requireAdmin, createBlog);
 
-// PUT /api/blogs/:id
-router.put("/:id", updateBlog);
+// PUT /api/blogs/:id — admin only
+router.put("/:id", requireLogin, requireAdmin, updateBlog);
 
-// DELETE /api/blogs/:id
-router.delete("/:id", deleteBlog);
+// DELETE /api/blogs/:id — admin only
+router.delete("/:id", requireLogin, requireAdmin, deleteBlog);
 
 module.exports = router;

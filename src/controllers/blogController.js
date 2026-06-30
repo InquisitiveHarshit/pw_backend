@@ -39,6 +39,9 @@ const getBlog = async (req, res) => {
 // @route  POST /api/blogs
 // @access Admin — TODO: enable auth before production
 const createBlog = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    return res.status(401).json({ success: false, message: "Not authenticated. Please log in." });
+  }
   const blog = await Blog.create({ ...req.body, author: req.user._id });
   res.status(201).json({ success: true, data: blog });
 };
