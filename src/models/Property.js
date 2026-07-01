@@ -16,26 +16,20 @@ const PropertySchema = new mongoose.Schema(
       required: [true, "Location is required"],
       trim: true,
     },
-    price: {
-      type: Number,
-      required: [true, "Price is required"],
-    },
+    units: [
+      {
+        propertyType: String,
+        bhk: String,
+        area: String,
+        price: String,
+        discountPrice: String,
+      }
+    ],
     images: [
       {
         type: String, // Cloudinary URLs
       },
     ],
-    type: {
-      type: String,
-      enum: ["apartment", "villa", "plot", "commercial", "other"],
-      default: "apartment",
-    },
-    bhk: {
-      type: Number,
-    },
-    area: {
-      type: Number, // in sq ft
-    },
     amenities: [String],
     totalSlots: {
       type: Number,

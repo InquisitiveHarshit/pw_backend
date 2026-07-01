@@ -10,6 +10,7 @@ const propertyRoutes = require("./routes/propertyRoutes");
 const groupRoutes = require("./routes/groupRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const userRoutes = require("./routes/userRoutes");
+const localityRoutes = require("./routes/localityRoutes");
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use("/api/properties", propertyRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/localities", localityRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 
