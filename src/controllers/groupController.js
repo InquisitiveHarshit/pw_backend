@@ -132,4 +132,102 @@ const getGroupById = async (req, res) => {
   res.status(200).json({ success: true, data: group });
 };
 
-module.exports = { joinGroup, getMyGroups, getAllGroups, getGroupById };
+// @desc   Admin adds a user to a buying group for a property
+// @route  POST /api/groups/admin-add-user
+// @access Admin — TODO: enable auth before production
+const adminAddUserToGroup = async (req, res) => {
+  const { propertyId, userId, interestedBHK, budget, message } = req.body;
+
+  if (!propertyId || !userId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "propertyId and userId are required." });
+  }
+
+  // Fetch property
+  const property = await Property.findById(propertyId);
+  if (!property) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Property not found." });
+  }
+
+  if (property.status !== "open") {
+    return res.status(400).json({
+      success: false,
+      message: `This property group is ${property.status}. No more slots available.`,
+    });
+  }
+
+  // Fetch user
+  const user = await User.findById(userId);
+  if (!user) {
+    return res
+      .status(404)
+      .json({ success: false, message: "User not found." });
+  }
+
+  // Check if user already joined a group for this property
+  const existingGroup = await Group.findOne({
+    property: propertyId,
+    "members.user": userId,
+  });
+
+  if (existingGroup) {
+    return res.status(400).json({
+      success: false,
+      message: "User has already joined the group for this property.",
+    });
+  }
+
+  // Find an open group for this property OR create one
+  let group = await Group.findOne({ property: propertyId, status: "forming" });
+
+  const memberEntry = {
+    user: userId,
+    interestedBHK,
+    budget,
+    message: message || "Added by admin",
+  };
+
+  if (group) {
+    // Add to existing group
+    group.members.push(memberEntry);
+    await group.save();
+  } else {
+    // Create a new group
+    group = await Group.create({
+      property: propertyId,
+      members: [memberEntry],
+    });
+  }
+
+  // Increment filledSlots on the property
+  property.filledSlots += 1;
+
+  // If full, update statuses
+  if (property.filledSlots >= property.totalSlots) {
+    property.status = "full";
+    group.status = "complete";
+    await group.save();
+  }
+
+  await property.save();
+
+  // Add group to user's joinedGroups
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { joinedGroups: group._id },
+  });
+
+  // Populate the response
+  await group.populate("members.user", "name email phone");
+  await group.populate("property", "title location price status");
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully added user to the buying group!",
+    data: group,
+  });
+};
+
+module.exports = { joinGroup, getMyGroups, getAllGroups, getGroupById, adminAddUserToGroup };

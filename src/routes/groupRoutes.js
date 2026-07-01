@@ -6,6 +6,7 @@ const {
   getMyGroups,
   getAllGroups,
   getGroupById,
+  adminAddUserToGroup,
 } = require("../controllers/groupController");
 
 // POST /api/groups/join — logged-in user joins a property group
@@ -19,5 +20,8 @@ router.get("/", getAllGroups);
 
 // GET /api/groups/:id — admin only, group detail
 router.get("/:id", getGroupById);
+
+// POST /api/groups/admin-add-user — admin only, adds a user to a group
+router.post("/admin-add-user", adminAddUserToGroup);
 
 module.exports = router;
