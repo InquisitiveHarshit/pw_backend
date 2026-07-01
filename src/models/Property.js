@@ -72,6 +72,10 @@ const PropertySchema = new mongoose.Schema(
     promotionalTag: {
       type: String, // e.g. "Selling Fast"
     },
+    reraNumber: {
+      type: String,
+      trim: true,
+    },
     brochureUrl: {
       type: String, // PDF or image link for brochure
     },
