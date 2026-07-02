@@ -6,7 +6,18 @@ const LocalitySchema = new mongoose.Schema(
       type: String,
       required: [true, "Locality name is required"],
       trim: true,
-      unique: true,
+    },
+    city: {
+      type: String,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    pincode: {
+      type: String,
+      trim: true,
     },
     activeProjects: {
       type: Number,

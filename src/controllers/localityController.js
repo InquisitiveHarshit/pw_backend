@@ -5,7 +5,19 @@ const Locality = require("../models/Locality");
 // @access  Public
 exports.getLocalities = async (req, res, next) => {
   try {
-    const localities = await Locality.find().sort({ createdAt: -1 });
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { city: { $regex: search, $options: "i" } },
+          { state: { $regex: search, $options: "i" } },
+          { pincode: { $regex: search, $options: "i" } }
+        ]
+      };
+    }
+    const localities = await Locality.find(query).sort({ createdAt: -1 }).limit(100);
     res.status(200).json({ success: true, data: localities });
   } catch (err) {
     next(err);
@@ -17,19 +29,22 @@ exports.getLocalities = async (req, res, next) => {
 // @access  Private/Admin
 exports.createLocality = async (req, res, next) => {
   try {
-    const { name, activeProjects, activeGroups } = req.body;
+    const { name, city, state, pincode, activeProjects, activeGroups } = req.body;
 
     if (!name) {
       return res.status(400).json({ success: false, message: "Locality name is required" });
     }
 
-    const exists = await Locality.findOne({ name });
+    const exists = await Locality.findOne({ name, city }); // Wait, name is not unique globally, but maybe name+city is? Let's just check name for now or allow duplicates if name+city exists. But let's keep name checking to avoid exact duplicates.
     if (exists) {
       return res.status(400).json({ success: false, message: "Locality already exists" });
     }
 
     const locality = await Locality.create({
       name,
+      city: city || "",
+      state: state || "",
+      pincode: pincode || "",
       activeProjects: activeProjects || 0,
       activeGroups: activeGroups || 0,
     });
